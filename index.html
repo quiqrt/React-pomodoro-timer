@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pomodoro Timer</title>
+    <script src="js/react.js"></script>
+    <script src="js/react-dom.js"></script>
+    <script src="js/browser.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6" id="block"></div>
+    </div>
+</div>
+
+    
+</div>
+
+    
+    <script type="text/babel">
+
+        function transform(time) {
+            var minutes = Math.floor(time / 60);
+            var seconds = time % 60;
+            var seconds = seconds!==0 ? seconds : "00";
+            return String(minutes + ":" + seconds);
+        };
+
+        function playAlarm() {
+            var audio = new Audio('js/alarm.mp3');
+            audio.play();
+        };
+
+        var defaultTime = 25;
+
+        var TimeP = React.createClass({
+            getInitialState: function() {
+                return {
+                    time: defaultTime * 60,
+                    running: false,
+                    classPlay: "button btn-play",
+                    name: "Pomodoro React Timer"
+                }
+            },
+
+
+            start: function() {
+                if(!this.state.running) {
+                    this.timer = setInterval(this.tick, 1000);
+                    this.changeClass(true,"button btn-pause");
+                } else {
+                 this.pause();
+                 this.changeClass(false,"button btn-play");
+                }
+            },
+
+            tick: function() { 
+                if(this.state.time !== 0) {
+                    this.setState({ time: this.state.time-1 })
+                } else {
+                    playAlarm();
+                    this.pause();
+                }        
+            },
+
+            // Изменить имя класса
+            changeClass: function(bool, name) {
+                this.setState({ running: bool, classPlay: name});
+            },
+
+
+
+            pause: function() {
+                clearInterval(this.timer);
+            },
+
+            //Исходное состояние таймера
+            restart: function() {
+                this.pause();
+                this.setState(this.getInitialState());
+            },
+
+            // Перерыв
+            brake: function(brakeMinutes) {
+                this.restart();
+                this.setState({ time: brakeMinutes * 60});
+                this.start();
+            },
+
+
+
+
+            render: function() {
+                return (
+                    <div>
+                        <p className="name">{this.state.name}</p>         
+                        <div className="buttons pom">               
+                            <div className={this.state.classPlay} onClick={this.start}></div>
+                        </div>
+
+                        <p className="timer">{transform(this.state.time)}</p>
+
+                        <div className="buttons">
+                            <div className="button brake" onClick={this.brake.bind(this, 5)}>Mini brake</div>
+                            <div className="button brake" onClick={this.brake.bind(this, 15)}>Long Brake</div>
+                            <div className="button brake" onClick={this.brake.bind(this, 25)}>Sprint</div>
+                            <div className="button restart" onClick={this.restart}></div>
+                        </div>
+                    </div>
+                );
+            }
+        });
+        
+        ReactDOM.render(
+                <TimeP />,
+                document.querySelector("#block")
+            );
+
+    </script>
+
+</body>
+</html>
