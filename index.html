@@ -28,7 +28,12 @@
         function transform(time) {
             var minutes = Math.floor(time / 60);
             var seconds = time % 60;
-            var seconds = seconds!==0 ? seconds : "00";
+
+            if(seconds == 0) {
+                seconds = "00";
+            } else if(seconds < 10) {
+                seconds = "0" + seconds;
+            }
             return String(minutes + ":" + seconds);
         };
 
